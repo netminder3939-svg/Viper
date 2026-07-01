@@ -250,3 +250,30 @@ App.actions['sb-offline'] = function () {
   closeAuth();
   App.actions['open-login'] && App.actions['open-login']();
 };
+// =============================================
+// PRODUCTION IMPROVEMENTS
+// =============================================
+
+App.actions['sb-staff-login'] = async function () {
+  const email = (document.getElementById('sb-email').value || '').trim();
+  const pass = document.getElementById('sb-pass').value || '';
+  const msg = document.getElementById('sb-msg');
+  if (msg) msg.textContent = 'Signing in...';
+
+  try {
+    const { data, error } = await SB.client.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      if (msg) {
+        msg.textContent = error.message;
+        msg.classList.add('err');
+      }
+    }
+  } catch (e) {
+    if (msg) msg.textContent = 'Connection error';
+  }
+};
+
+// Auto refresh session
+sb.auth.onAuthStateChange((event) => {
+  if (event === 'TOKEN_REFRESHED') console.log('✅ Session refreshed');
+});
