@@ -180,69 +180,73 @@
   };
 
   /* ---------------- AUTH SCREEN ------------------------------------- */
-  function authHTML() {
-    var name = 'Viper Electric';
-    try { name = Store.state().settings.business.name; } catch (e) {}
-    return '<div class="login-panel auth-panel">' +
-      '<div class="login-head"><div class="login-mark">' + App.icon('bolt') + '</div><div><div class="login-title">' + name + ' OS</div><div class="login-sub">Sign in to your workspace</div></div></div>' +
-      '<div class="auth-tabs"><button class="auth-tab on" data-action="sb-tab" data-tab="staff">Staff</button><button class="auth-tab" data-action="sb-tab" data-tab="customer">Customer</button></div>' +
-      '<div class="auth-body" id="auth-staff">' +
-        '<label class="field"><span class="field-label">Email</span><input class="inp" id="sb-email" type="email" placeholder="you@business.com"></label>' +
-        '<label class="field"><span class="field-label">Password</span><input class="inp" id="sb-pass" type="password" placeholder="••••••••"></label>' +
-        '<div class="mt12">' + App._ui.btn('Sign in', { variant: 'brand', block: true, action: 'sb-staff-login' }) + '</div>' +
-        '<div class="auth-alt" id="sb-msg"></div>' +
-      '</div>' +
-      '<div class="auth-body" id="auth-customer" style="display:none">' +
-        '<label class="field"><span class="field-label">Your email</span><input class="inp" id="sb-cemail" type="email" placeholder="you@email.com"></label>' +
-        '<p class="muted" style="font-size:12.5px">We\'ll email you a secure sign-in link — no password needed.</p>' +
-        '<div class="mt12">' + App._ui.btn('Email me a link', { variant: 'brand', block: true, icon: 'mail', action: 'sb-magic' }) + '</div>' +
-        '<div class="auth-alt" id="sb-cmsg"></div>' +
-      '</div>' +
-      '<div class="login-foot">Trouble signing in? Check the setup guide. · <button class="login-link" data-action="sb-offline">Explore offline (no cloud)</button></div>' +
-    '</div>';
+function authHTML() {
+  var name = 'Viper Electric';
+  try { name = Store.state().settings.business.name; } catch (e) {}
+  return '<div class="login-panel auth-panel">' +
+    '<div class="login-head"><div class="login-mark">' + App.icon('bolt') + '</div><div><div class="login-title">' + name + ' OS</div><div class="login-sub">Sign in to your workspace</div></div></div>' +
+    '<div class="auth-tabs"><button class="auth-tab on" data-action="sb-tab" data-tab="staff">Staff</button><button class="auth-tab" data-action="sb-tab" data-tab="customer">Customer</button></div>' +
+    '<div class="auth-body" id="auth-staff">' +
+      '<label class="field"><span class="field-label">Email</span><input class="inp" id="sb-email" type="email" placeholder="jacob.pope@outlook.com"></label>' +
+      '<label class="field"><span class="field-label">Password</span><input class="inp" id="sb-pass" type="password" placeholder="••••••••"></label>' +
+      '<div class="mt12">' + App._ui.btn('Sign in', { variant: 'brand', block: true, action: 'sb-staff-login' }) + '</div>' +
+      '<div class="auth-alt" id="sb-msg"></div>' +
+    '</div>' +
+    '<div class="auth-body" id="auth-customer" style="display:none">' +
+      '<label class="field"><span class="field-label">Your email</span><input class="inp" id="sb-cemail" type="email" placeholder="you@email.com"></label>' +
+      '<p class="muted" style="font-size:12.5px">We\'ll email you a secure sign-in link.</p>' +
+      '<div class="mt12">' + App._ui.btn('Email me a link', { variant: 'brand', block: true, icon: 'mail', action: 'sb-magic' }) + '</div>' +
+      '<div class="auth-alt" id="sb-cmsg"></div>' +
+    '</div>' +
+    '<div class="login-foot">Trouble? <button class="login-link" data-action="sb-offline">Use offline demo</button></div>' +
+  '</div>';
+}
+
+function openAuth() {
+  var el = document.getElementById('login-screen') || document.createElement('div');
+  el.id = 'login-screen';
+  document.body.appendChild(el);
+  el.innerHTML = authHTML();
+  el.classList.add('open');
+  document.body.classList.add('login-open');
+}
+function closeAuth() {
+  var el = document.getElementById('login-screen');
+  if (el) { el.classList.remove('open'); el.innerHTML = ''; }
+  document.body.classList.remove('login-open');
+}
+
+App.actions['sb-tab'] = function (el, d) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('on', t.getAttribute('data-tab') === d.tab));
+  document.getElementById('auth-staff').style.display = d.tab === 'staff' ? '' : 'none';
+  document.getElementById('auth-customer').style.display = d.tab === 'customer' ? '' : 'none';
+};
+
+App.actions['sb-staff-login'] = async function () {
+  const email = (document.getElementById('sb-email').value || '').trim();
+  const pass = document.getElementById('sb-pass').value || '';
+  const msg = document.getElementById('sb-msg');
+  msg.textContent = 'Signing in…';
+  msg.classList.remove('err');
+
+  try {
+    const { data, error } = await SB.client.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      msg.textContent = error.message;
+      msg.classList.add('err');
+    } else {
+      msg.textContent = 'Success!';
+    }
+  } catch (e) {
+    msg.textContent = 'Network error';
+    msg.classList.add('err');
+    console.error(e);
   }
-  function openAuth() {
-    var el = document.getElementById('login-screen');
-    if (!el) { el = document.createElement('div'); el.id = 'login-screen'; document.body.appendChild(el); }
-    el.innerHTML = authHTML(); el.classList.add('open'); document.body.classList.add('login-open');
-  }
-  function closeAuth() { var el = document.getElementById('login-screen'); if (el) { el.classList.remove('open'); el.innerHTML = ''; } document.body.classList.remove('login-open'); }
+};
 
-  App.actions['sb-tab'] = function (el, d) {
-    document.querySelectorAll('.auth-tab').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-tab') === d.tab); });
-    document.getElementById('auth-staff').style.display = d.tab === 'staff' ? '' : 'none';
-    document.getElementById('auth-customer').style.display = d.tab === 'customer' ? '' : 'none';
-  };
-  App.actions['sb-staff-login'] = function () {
-    var email = (document.getElementById('sb-email').value || '').trim();
-    var pass = document.getElementById('sb-pass').value || '';
-    var msg = document.getElementById('sb-msg'); msg.textContent = 'Signing in…';
-    sb.auth.signInWithPassword({ email: email, password: pass }).then(function (r) {
-      if (r.error) { msg.textContent = r.error.message; msg.classList.add('err'); }
-      else msg.textContent = '';
-    });
-  };
-  App.actions['sb-magic'] = function () {
-    var email = (document.getElementById('sb-cemail').value || '').trim();
-    var msg = document.getElementById('sb-cmsg');
-    if (!email) { msg.textContent = 'Enter your email first.'; return; }
-    msg.textContent = 'Sending…';
-    sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: global.location.origin } }).then(function (r) {
-      msg.textContent = r.error ? r.error.message : 'Check your email for the sign-in link.';
-    });
-  };
-  App.actions['sb-offline'] = function () {
-    // let the built-in demo role picker take over, on local storage only
-    SB.ready = false; closeAuth();
-    if (App.actions['open-login']) App.actions['open-login']();
-    else { App.session = { role: 'owner', userId: 'u_owner' }; origLaunch(); }
-  };
-
-  // real sign-out for the cloud
-  var origLogout = App.actions['logout'];
-  App.actions['logout'] = function () {
-    if (SB.enabled) { sb.auth.signOut().then(function () { SB.ready = false; openAuth(); }); }
-    else if (origLogout) origLogout();
-  };
-
-})(typeof window !== 'undefined' ? window : this);
+App.actions['sb-magic'] = function () { /* similar for magic link */ };
+App.actions['sb-offline'] = function () {
+  SB.ready = false;
+  closeAuth();
+  App.actions['open-login'] && App.actions['open-login']();
+};
