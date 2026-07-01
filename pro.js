@@ -608,12 +608,19 @@
     Store.advanceContactStage(e.contactId, 'prospect');
     sendComm(e.contactId, 't_est', { estimate_number: e.number, job_title: e.items[0] ? e.items[0].desc : 'your project', amount: money(Store.estimateTotal(e)) });
   });
-  // Money → contact becomes a Customer + receipt/invoice comms
-  wrap('mark-paid', function (el, d) {
-    var v = Store.get('invoices', d.id); if (!v) return;
-    Store.advanceContactStage(v.contactId, 'customer');
-    sendComm(v.contactId, 't_receipt', { amount: money(Store.invoiceTotal(v)), invoice_number: v.number });
-  });
+  // Money → contact becomes a Customer + receipt/invoice comms + auto review
+wrap('mark-paid', function (el, d) {
+  var v = Store.get('invoices', d.id); if (!v) return;
+  Store.advanceContactStage(v.contactId, 'customer');
+  sendComm(v.contactId, 't_receipt', { amount: money(Store.invoiceTotal(v)), invoice_number: v.number });
+
+  // === AUTO GOOGLE REVIEW (24 hours later) ===
+  setTimeout(() => {
+    sendComm(v.contactId, 't_review', { 
+      link: 'https://g.page/r/YOUR_GOOGLE_PLACE_ID/review'   // ← CHANGE THIS
+    });
+  }, 86400000);
+});
   wrap('create-invoice', function () { var v = Store.all('invoices')[0]; if (v) sendComm(v.contactId, 't_inv', { invoice_number: v.number, amount: money(Store.invoiceTotal(v)) }); });
   wrap('job-to-invoice', function () { var v = Store.all('invoices')[0]; if (v) sendComm(v.contactId, 't_inv', { invoice_number: v.number, amount: money(Store.invoiceTotal(v)) }); });
   wrap('complete-job', function (el, d) { var j = Store.get('jobs', d.id); if (j) sendComm(j.contactId, 't_complete', { job_title: j.title }); });
