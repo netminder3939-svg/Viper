@@ -13,7 +13,7 @@
   function uid(p) { return (p || 'id') + '_' + Math.random().toString(36).slice(2, 9); }
   var NOW = new Date();
   function dayShift(n) { var d = new Date(NOW); d.setDate(d.getDate() + n); return d; }
-  function iso(d) { return d.toISOString().slice(0, 10); }
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function nowISO() { return new Date().toISOString(); }
   // compact captioned placeholder "photo" (SVG data URL) so galleries look alive without heavy binaries
   function svgPhoto(label, c1, c2) {
@@ -30,15 +30,15 @@
     ];
 
     var contacts = [
-      { id: 'c_hart', name: 'Sarah Hartman', company: 'Hartman Residence', email: 's.hartman@email.com', phone: '(208) 555-2148', type: 'Residential', stage: 'customer', owner: 'u_ops', address: '14 Lakeshore Dr, Coeur d\'Alene, ID', tags: ['panel', 'repeat'], createdAt: iso(dayShift(-120)), lastContact: iso(NOW) },
-      { id: 'c_bloom', name: 'Derek Bloom', company: 'Bloom Electric Co.', email: 'derek@bloomco.com', phone: '(208) 555-3394', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '88 Industry Way, Post Falls, ID', tags: ['ev', 'partner'], createdAt: iso(dayShift(-86)), lastContact: iso(dayShift(-1)) },
-      { id: 'c_ridge', name: 'James Ridge', company: 'Ridgeline Commercial', email: 'james@ridgeline.com', phone: '(208) 555-4277', type: 'Commercial', stage: 'prospect', owner: 'u_owner', address: '2200 Seltice Way, Post Falls, ID', tags: ['rewire', 'big'], createdAt: iso(dayShift(-30)), lastContact: iso(dayShift(-6)) },
-      { id: 'c_vista', name: 'Maria Torres', company: 'Vista Medical Center', email: 'm.torres@vistamed.com', phone: '(208) 555-5166', type: 'Commercial', stage: 'prospect', owner: 'u_ops', address: '500 Health Pkwy, Coeur d\'Alene, ID', tags: ['generator'], createdAt: iso(dayShift(-12)), lastContact: iso(dayShift(-2)) },
-      { id: 'c_core', name: 'CoreLink Properties', company: 'CoreLink Properties', email: 'ap@corelink.com', phone: '(208) 555-6033', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '1 Riverstone Dr, Coeur d\'Alene, ID', tags: ['property-mgmt'], createdAt: iso(dayShift(-200)), lastContact: iso(dayShift(-3)) },
-      { id: 'c_mesa', name: 'Mesa Industrial Park', company: 'Mesa Industrial', email: 'ops@mesaindustrial.com', phone: '(208) 555-7884', type: 'Industrial', stage: 'lead', owner: 'u_ops', address: '4100 Ramsey Rd, Hayden, ID', tags: ['assessment', 'hot'], createdAt: iso(dayShift(-4)), lastContact: null },
-      { id: 'c_harbor', name: 'Harbor Lofts HOA', company: 'Harbor Lofts', email: 'mgmt@harborlofts.com', phone: '(208) 555-8821', type: 'Residential', stage: 'customer', owner: 'u_ops', address: '70 Marina Blvd, Coeur d\'Alene, ID', tags: ['hoa'], createdAt: iso(dayShift(-60)), lastContact: iso(dayShift(-5)) },
-      { id: 'c_peak', name: 'Peak Fitness', company: 'Peak Fitness', email: 'owner@peakfit.com', phone: '(208) 555-9540', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '300 Government Way, Coeur d\'Alene, ID', tags: ['panel'], createdAt: iso(dayShift(-150)), lastContact: iso(dayShift(-15)) },
-      { id: 'c_sun', name: 'Sunridge HOA', company: 'Sunridge HOA', email: 'board@sunridge.org', phone: '(208) 555-1190', type: 'Residential', stage: 'lead', owner: 'u_ops', address: '15 Sunridge Loop, Hayden, ID', tags: ['lighting'], createdAt: iso(dayShift(-3)), lastContact: null }
+      { id: 'c_hart', name: 'Sarah Hartman', company: 'Hartman Residence', email: 's.hartman@email.com', phone: '(208) 555-2148', type: 'Residential', stage: 'customer', owner: 'u_ops', address: '14 Lakeshore Dr, Coeur d\'Alene, ID', tags: ['panel', 'repeat'], source: 'Referral', createdAt: iso(dayShift(-120)), lastContact: iso(NOW) },
+      { id: 'c_bloom', name: 'Derek Bloom', company: 'Bloom Electric Co.', email: 'derek@bloomco.com', phone: '(208) 555-3394', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '88 Industry Way, Post Falls, ID', tags: ['ev', 'partner'], source: 'Referral', createdAt: iso(dayShift(-86)), lastContact: iso(dayShift(-1)) },
+      { id: 'c_ridge', name: 'James Ridge', company: 'Ridgeline Commercial', email: 'james@ridgeline.com', phone: '(208) 555-4277', type: 'Commercial', stage: 'prospect', owner: 'u_owner', address: '2200 Seltice Way, Post Falls, ID', tags: ['rewire', 'big'], source: 'Email', createdAt: iso(dayShift(-30)), lastContact: iso(dayShift(-6)) },
+      { id: 'c_vista', name: 'Maria Torres', company: 'Vista Medical Center', email: 'm.torres@vistamed.com', phone: '(208) 555-5166', type: 'Commercial', stage: 'prospect', owner: 'u_ops', address: '500 Health Pkwy, Coeur d\'Alene, ID', tags: ['generator'], source: 'Phone call', createdAt: iso(dayShift(-12)), lastContact: iso(dayShift(-2)) },
+      { id: 'c_core', name: 'CoreLink Properties', company: 'CoreLink Properties', email: 'ap@corelink.com', phone: '(208) 555-6033', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '1 Riverstone Dr, Coeur d\'Alene, ID', tags: ['property-mgmt'], source: 'Referral', createdAt: iso(dayShift(-200)), lastContact: iso(dayShift(-3)) },
+      { id: 'c_mesa', name: 'Mesa Industrial Park', company: 'Mesa Industrial', email: 'ops@mesaindustrial.com', phone: '(208) 555-7884', type: 'Industrial', stage: 'lead', owner: 'u_ops', address: '4100 Ramsey Rd, Hayden, ID', tags: ['assessment', 'hot'], source: 'Website CTA', createdAt: iso(dayShift(-4)), lastContact: null },
+      { id: 'c_harbor', name: 'Harbor Lofts HOA', company: 'Harbor Lofts', email: 'mgmt@harborlofts.com', phone: '(208) 555-8821', type: 'Residential', stage: 'customer', owner: 'u_ops', address: '70 Marina Blvd, Coeur d\'Alene, ID', tags: ['hoa'], source: 'Manual entry', createdAt: iso(dayShift(-60)), lastContact: iso(dayShift(-5)) },
+      { id: 'c_peak', name: 'Peak Fitness', company: 'Peak Fitness', email: 'owner@peakfit.com', phone: '(208) 555-9540', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '300 Government Way, Coeur d\'Alene, ID', tags: ['panel'], source: 'Phone call', createdAt: iso(dayShift(-150)), lastContact: iso(dayShift(-15)) },
+      { id: 'c_sun', name: 'Sunridge HOA', company: 'Sunridge HOA', email: 'board@sunridge.org', phone: '(208) 555-1190', type: 'Residential', stage: 'lead', owner: 'u_ops', address: '15 Sunridge Loop, Hayden, ID', tags: ['lighting'], source: 'Referral', createdAt: iso(dayShift(-3)), lastContact: null }
     ];
 
     var deals = [
@@ -242,6 +242,7 @@
     if (!s.requests) s.requests = [];
     if (!s.timesheets) s.timesheets = [];
     (s.team || []).forEach(function (m) { if (m.hourlyCost === undefined) m.hourlyCost = 50; });
+    (s.contacts || []).forEach(function (c) { if (!c.source) c.source = 'Manual entry'; });
     (s.jobs || []).forEach(function (j) {
       if (!j.photos) j.photos = [];
       if (!j.costs) j.costs = [];

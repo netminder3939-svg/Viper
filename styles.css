@@ -241,6 +241,10 @@ body { font-family: var(--sans); background: var(--canvas); color: var(--t1); -w
 .cal-cell.sel { border-color: var(--brand); background: rgba(79,70,229,.06); }
 .cal-dots { margin-top: auto; display: flex; gap: 3px; }
 .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); }
+.cal-dot-done { background: var(--t3); opacity: .5; }
+.cal-job-done { opacity: .55; }
+.cal-job-done .lr-title { text-decoration: line-through; }
+.cal-job-done .ic { width: 14px; height: 14px; color: var(--ok); vertical-align: -2px; margin-right: 2px; }
 
 /* ===== INBOX ===== */
 .inbox { display: grid; grid-template-columns: 340px 1fr; gap: 18px; height: calc(100vh - 150px); }
