@@ -1,4 +1,4 @@
--- =====================================================================
+---- =====================================================================
 -- Viper OS — Supabase schema
 -- Run this ONCE in your project: Supabase Dashboard → SQL Editor → paste → Run.
 -- Safe to re-run: everything is idempotent (drops/creates guarded).
