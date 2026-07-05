@@ -43,7 +43,7 @@
 
   /* ---------------- launch: gate on auth, then hydrate --------------- */
   var origLaunch = App.launch;
-  App.launch = function () { bootstrap(); };
+  App.launch = function () { App._bindGlobal && App._bindGlobal(); bootstrap(); };
 
   async function bootstrap() {
     try {
@@ -99,6 +99,7 @@
       var m = await sb.from('meta').select('key,data');
       if (m && m.data) m.data.forEach(function (row) { if (row.data) st[row.key] = row.data; });
     } catch (e) {}
+    try { Store.ensureShape && Store.ensureShape(); } catch (e) {} // back-fill fields added since the DB was seeded
     SB.ready = true;
     snap();               // baseline snapshot so first save() diffs correctly
   }
