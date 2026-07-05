@@ -13,8 +13,19 @@
   function uid(p) { return (p || 'id') + '_' + Math.random().toString(36).slice(2, 9); }
   var NOW = new Date();
   function dayShift(n) { var d = new Date(NOW); d.setDate(d.getDate() + n); return d; }
-  function iso(d) { return d.toISOString().slice(0, 10); }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  // LOCAL calendar date (not UTC) — prevents the "off by a day" shift in the
+  // evening for timezones west of UTC.
+  function iso(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
   function nowISO() { return new Date().toISOString(); }
+  // parse a stored date safely: date-only strings become LOCAL midnight
+  function parseDate(s) {
+    if (!s) return null;
+    if (typeof s === 'string' && s.length === 10 && s.indexOf('T') < 0) {
+      var p = s.split('-'); return new Date(+p[0], (+p[1]) - 1, +p[2]);
+    }
+    return new Date(s);
+  }
   // compact captioned placeholder "photo" (SVG data URL) so galleries look alive without heavy binaries
   function svgPhoto(label, c1, c2) {
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><g fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="6"><path d="M40 210h120l30-40 30 60 40-80 30 60h60"/><circle cx="320" cy="70" r="26"/></g><text x="20" y="285" font-family="monospace" font-size="18" fill="#ffffff" fill-opacity="0.9">' + label + '</text></svg>';
@@ -24,9 +35,9 @@
   /* ---- seed (built relative to "today" so it always looks live) -- */
   function seed() {
     var team = [
-      { id: 'u_owner', name: 'Marcus Vance', role: 'Owner', email: 'marcus@viperelectric.com', phone: '(208) 555-0111', status: 'active', color: '#4f46e5', initials: 'MV', hourlyCost: 75 },
-      { id: 'u_cofd', name: 'Dale Briggs', role: 'Lead Tech', email: 'dale@viperelectric.com', phone: '(208) 555-0112', status: 'active', color: '#0891b2', initials: 'DB', hourlyCost: 55 },
-      { id: 'u_ops', name: 'Jordan Reyes', role: 'Operations', email: 'jordan@viperelectric.com', phone: '(208) 555-0113', status: 'active', color: '#7c3aed', initials: 'JR', hourlyCost: 45 }
+      { id: 'u_owner', name: 'Ben Gloe', role: 'Owner / CEO', email: 'viprelectric208@gmail.com', phone: '', status: 'active', color: '#4f46e5', initials: 'BG', hourlyCost: 85 },
+      { id: 'u_cofd', name: 'Zach Gardner', role: 'Owner / President', email: 'viprelectric208@gmail.com', phone: '', status: 'active', color: '#0891b2', initials: 'ZG', hourlyCost: 85 },
+      { id: 'u_ops', name: 'Office / Dispatch', role: 'Operations', email: 'viprelectric208@gmail.com', phone: '', status: 'active', color: '#7c3aed', initials: 'OD', hourlyCost: 45 }
     ];
 
     var contacts = [
@@ -119,8 +130,8 @@
     ];
 
     var settings = {
-      business: { name: 'Viper Electric', tagline: 'Licensed & insured · Coeur d\'Alene, ID', phone: '(208) 555-0100', email: 'office@viperelectric.com', address: '123 Commerce Dr, Coeur d\'Alene, ID 83814' },
-      branding: { primary: '#4f46e5', accent: '#06b6d4', logo: null, favicon: null, welcome: 'Here\'s what\'s happening today.', loginTagline: 'Operations, sales, and dispatch in one place.', emailFooter: 'Viper Electric · (208) 555-0100 · Licensed & insured · Coeur d\'Alene, ID' },
+      business: { name: 'Vipr Electric', tagline: 'Licensed electricians · Kootenai & Bonner County, ID', phone: '', email: 'viprelectric208@gmail.com', address: 'Kootenai & Bonner County, ID', hours: 'Mon–Thurs, 7am–5pm', emergency: '24/7 for customers under warranty', warranty: '1-year warranty', serviceArea: 'Kootenai & Bonner County', veteranDiscount: true, owners: 'Ben Gloe (Owner/CEO) · Zach Gardner (Owner/President)' },
+      branding: { primary: '#4f46e5', accent: '#06b6d4', logo: null, favicon: null, welcome: 'Here\'s what\'s happening at Vipr Electric today.', loginTagline: 'Licensed electricians · Kootenai & Bonner County', emailFooter: 'Vipr Electric · viprelectric208@gmail.com · Kootenai & Bonner County, ID · Licensed & insured' },
       services: [
         { id: 'svc_host', name: 'Website Hosting', category: 'Web', price: 49, active: true, desc: 'Fast, secure hosting with SSL and backups.' },
         { id: 'svc_maint', name: 'Website Maintenance', category: 'Web', price: 99, active: false, desc: 'Updates, edits, and monitoring each month.' },
@@ -195,18 +206,22 @@
 
     // reusable priced services (the price book)
     var catalog = [
+      // ★ bread-and-butter
+      { id: 'sv_panel', name: 'Panel upgrade / service change', category: 'Panels', unit: 'each', rate: 3200, cost: 1400 },
+      { id: 'sv_ev', name: 'EV charger install', category: 'EV', unit: 'each', rate: 1850, cost: 800 },
+      { id: 'sv_newconstruct', name: 'New construction — residential', category: 'New Construction', unit: 'project', rate: 8500, cost: 4200 },
+      { id: 'sv_quote', name: 'Free quote / estimate', category: 'Service', unit: 'visit', rate: 0, cost: 25 },
+      { id: 'sv_rewire', name: 'Remodel / re-wire / addition', category: 'Rewire', unit: 'project', rate: 3800, cost: 1700 },
+      { id: 'sv_lighting', name: 'Lighting & device upgrade / replacement', category: 'Lighting', unit: 'each', rate: 225, cost: 70 },
+      // standard catalog
+      { id: 'sv_inspect', name: 'Safety inspection', category: 'Service', unit: 'visit', rate: 189, cost: 40 },
+      { id: 'sv_pedestal', name: 'Pedestal install', category: 'Power', unit: 'each', rate: 950, cost: 380 },
+      { id: 'sv_gen', name: 'Generator + transfer switch install', category: 'Power', unit: 'each', rate: 6800, cost: 3400 },
+      { id: 'sv_lightdesign', name: 'Lighting design + install', category: 'Lighting', unit: 'project', rate: 2400, cost: 1000 },
+      { id: 'sv_surge', name: 'Whole-home surge protection', category: 'Panels', unit: 'each', rate: 595, cost: 190 },
+      { id: 'sv_data', name: 'Data / communications system', category: 'Low Voltage', unit: 'project', rate: 1400, cost: 520 },
       { id: 'sv_call', name: 'Service call / diagnostic', category: 'Service', unit: 'visit', rate: 129, cost: 30 },
-      { id: 'sv_trouble', name: 'Troubleshooting (labor)', category: 'Service', unit: 'hour', rate: 145, cost: 55 },
-      { id: 'sv_outlet', name: 'Outlet / receptacle install', category: 'Devices', unit: 'each', rate: 185, cost: 45 },
-      { id: 'sv_gfci', name: 'GFCI outlet install', category: 'Devices', unit: 'each', rate: 220, cost: 60 },
-      { id: 'sv_recessed', name: 'Recessed light install', category: 'Lighting', unit: 'each', rate: 165, cost: 55 },
-      { id: 'sv_fan', name: 'Ceiling fan install', category: 'Lighting', unit: 'each', rate: 285, cost: 80 },
-      { id: 'sv_panel', name: '200A panel upgrade', category: 'Panels', unit: 'each', rate: 4800, cost: 2100 },
-      { id: 'sv_ev', name: 'EV charger (Level 2) install', category: 'EV', unit: 'each', rate: 3200, cost: 1400 },
-      { id: 'sv_surge', name: 'Whole-home surge protector', category: 'Panels', unit: 'each', rate: 650, cost: 220 },
-      { id: 'sv_gen', name: 'Standby generator install', category: 'Power', unit: 'each', rate: 11500, cost: 6800 },
-      { id: 'sv_rewire', name: 'Room rewire', category: 'Rewire', unit: 'room', rate: 2800, cost: 1200 },
-      { id: 'sv_inspect', name: 'Annual safety inspection', category: 'Service', unit: 'visit', rate: 199, cost: 40 }
+      { id: 'sv_outlet', name: 'Outlet / receptacle install', category: 'Devices', unit: 'each', rate: 185, cost: 45 }
     ];
 
     // inbound quote requests (public "Client Hub" intake)
@@ -257,6 +272,9 @@
     if (st.branding.loginTagline === undefined) st.branding.loginTagline = 'Operations, sales, and dispatch in one place.';
     if (st.branding.emailFooter === undefined) st.branding.emailFooter = b.settings.branding.emailFooter;
     if (!st.services) st.services = b.settings.services;
+    var bd = st.business || (st.business = {});
+    ['hours', 'emergency', 'warranty', 'serviceArea', 'owners'].forEach(function (k) { if (bd[k] === undefined) bd[k] = b.settings.business[k] || ''; });
+    if (bd.veteranDiscount === undefined) bd.veteranDiscount = !!b.settings.business.veteranDiscount;
     if (!st.dashboard) st.dashboard = b.settings.dashboard.slice();
     if (!st.stageAutomation) st.stageAutomation = b.settings.stageAutomation;
     if (!s.templates || !s.templates.length) s.templates = b.templates;
@@ -308,7 +326,7 @@
 
   function thisMonth(dateStr) {
     if (!dateStr) return false;
-    var d = new Date(dateStr);
+    var d = parseDate(dateStr);
     return d.getMonth() === NOW.getMonth() && d.getFullYear() === NOW.getFullYear();
   }
 
@@ -394,13 +412,13 @@
     for (var i = n - 1; i >= 0; i--) {
       var d = new Date(NOW.getFullYear(), NOW.getMonth() - i, 1);
       var key = monthKey(d);
-      var val = paid.filter(function (v) { var pd = new Date(v.paidAt); return monthKey(pd) === key; }).reduce(function (s, v) { return s + invoiceTotal(v); }, 0);
+      var val = paid.filter(function (v) { var pd = parseDate(v.paidAt); return monthKey(pd) === key; }).reduce(function (s, v) { return s + invoiceTotal(v); }, 0);
       out.push({ label: d.toLocaleDateString('en-US', { month: 'short' }), value: val });
     }
     return out;
   }
   function within(dateStr, days) {
-    if (!dateStr) return false; var d = new Date(dateStr); var diff = (d - NOW) / 86400000;
+    if (!dateStr) return false; var d = parseDate(dateStr); var diff = (d - NOW) / 86400000;
     return diff >= -0.5 && diff <= days;
   }
   function extraKpis() {
@@ -419,7 +437,7 @@
       jobsThisWeek: jobs.filter(function (j) { return within(j.date, 7) && (j.status === 'scheduled' || j.status === 'in_progress'); }).length,
       upcoming: jobs.filter(function (j) { return within(j.date, 7); }).sort(function (a, b) { return a.date < b.date ? -1 : 1; }),
       avgJobValue: jobVals.length ? Math.round(jobVals.reduce(function (s, v) { return s + v; }, 0) / jobVals.length) : 0,
-      newLeads7: all('contacts').filter(function (c) { return within(c.createdAt, 0) || (c.createdAt && (NOW - new Date(c.createdAt)) / 86400000 <= 7); }).length,
+      newLeads7: all('contacts').filter(function (c) { return within(c.createdAt, 0) || (c.createdAt && (NOW - parseDate(c.createdAt)) / 86400000 <= 7); }).length,
       activeJobs: jobs.filter(function (j) { return j.status === 'in_progress'; }).length,
       completedJobs: doneJobs.length
     };
@@ -468,14 +486,14 @@
   function arAging() {
     var buckets = { current: 0, d30: 0, d60: 0, d90: 0 };
     all('invoices').filter(function (v) { return v.status !== 'paid'; }).forEach(function (v) {
-      var days = Math.round((NOW - new Date(v.dueAt)) / 86400000); var amt = invoiceTotal(v);
+      var days = Math.round((NOW - parseDate(v.dueAt)) / 86400000); var amt = invoiceTotal(v);
       if (days <= 0) buckets.current += amt; else if (days <= 30) buckets.d30 += amt; else if (days <= 60) buckets.d60 += amt; else buckets.d90 += amt;
     });
     return buckets;
   }
 
   /* ---- time-based automation runner (fires once per condition) --- */
-  function daysAgo(dateStr) { return dateStr ? Math.round((NOW - new Date(dateStr)) / 86400000) : 0; }
+  function daysAgo(dateStr) { return dateStr ? Math.round((NOW - parseDate(dateStr)) / 86400000) : 0; }
   function runAutomations(send) {
     var fired = [];
     var a2 = get('automations', 'a2');
