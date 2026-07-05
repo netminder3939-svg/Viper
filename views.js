@@ -349,6 +349,14 @@
         field('Business name', input('set-name', 'value="' + esc(s.business.name) + '"')) + field('Phone', input('set-phone', 'value="' + esc(s.business.phone) + '"')) +
         field('Email', input('set-email', 'value="' + esc(s.business.email) + '"')) + field('Tax rate (%)', input('set-tax', 'type="number" step="0.1" value="' + s.taxRate + '"')) + '</div>' +
         field('Address', input('set-addr', 'value="' + esc(s.business.address) + '"')) +
+        '<div class="form-grid">' +
+        field('Owners', input('set-owners', 'value="' + esc(s.business.owners || '') + '"')) + field('Service area', input('set-area', 'value="' + esc(s.business.serviceArea || '') + '"')) +
+        '</div><div class="form-grid">' +
+        field('Hours', input('set-hours', 'value="' + esc(s.business.hours || '') + '"')) + field('Warranty', input('set-warranty', 'value="' + esc(s.business.warranty || '') + '"')) +
+        '</div><div class="form-grid">' +
+        field('Emergency response', input('set-emergency', 'value="' + esc(s.business.emergency || '') + '"')) +
+        '<label class="field"><span class="field-label">Veteran discount</span><label class="switch" style="margin-top:6px"><input type="checkbox" id="set-vet" ' + (s.business.veteranDiscount ? 'checked' : '') + '><span class="slider"></span></label></label>' +
+        '</div>' +
         '<div class="form-grid"><div><span class="field-label">Brand color</span><div class="swatches">' + swatches + '</div></div></div><div class="mt12">' + btn('Save changes', { variant: 'brand', action: 'save-settings' }) + '</div>', 'rise');
       var team = card(sectionTitle('Team', btn('Add member', { sm: true, action: 'add-member' })) + Store.all('team').map(function (m) {
         return '<div class="line-row">' + avatar(m.name, 32, m.color) + '<div class="lr-main"><div class="lr-title">' + esc(m.name) + '</div><div class="lr-sub">' + esc(m.role) + ' · ' + esc(m.email) + '</div></div>' + pill(m.status, m.status === 'active' ? 'green' : 'gray') + btn('', { icon: 'trash', sm: true, action: 'remove-member', data: { id: m.id } }) + '</div>';
@@ -356,7 +364,7 @@
       var integ = card(sectionTitle('Integrations') + [['Supabase', 'Sync data across devices & your whole team', 'pipeline'], ['Stripe', 'Take card payments on invoices', 'dollar'], ['QuickBooks', 'Push invoices & payments to your books', 'invoice'], ['Twilio', 'Send real SMS texts to clients', 'phone']].map(function (it) {
         return '<div class="line-row"><span class="int-ic">' + icon(it[2]) + '</span><div class="lr-main"><div class="lr-title">' + it[0] + '</div><div class="lr-sub">' + it[1] + '</div></div>' + btn('Connect', { sm: true, action: 'connect-integration', data: { name: it[0] } }) + '</div>';
       }).join(''), 'rise');
-      var danger = card(sectionTitle('Data') + '<p class="muted">Your data is saved on this device. Reset returns everything to the sample set.</p><div class="mt12">' + btn('Reset to sample data', { action: 'reset-data' }) + '</div>', 'rise');
+      var danger = card(sectionTitle('Data') + '<p class="muted">Load the Vipr Electric starter set (services, team, branding) — useful the first time to brand your live workspace. This replaces demo records.</p><div class="mt12">' + btn('Load Vipr Electric starter data', { action: 'reset-data' }) + '</div>', 'rise');
       return '<div class="grid-2">' + biz + team + '</div><div class="grid-2">' + integ + danger + '</div>';
     }
   };
@@ -389,7 +397,7 @@
   }
   function offlineReply(msg) {
     var m = msg.toLowerCase();
-    if (m.indexOf('ridgeline') >= 0) return 'Subject: Following up on your rewire estimate (EST-1014)\n\nHi James,\n\nCircling back on the $24,000 full-building rewire we quoted. We can still hold a crew slot that fits your timeline, but it\'s filling for next month. Happy to walk the scope or adjust anything that helps you move forward — would a quick call this week work?\n\nBest,\nViper Electric · (208) 555-0100\n\n— Demo reply. Add your Anthropic API key (see README) for live drafts.';
+    if (m.indexOf('ridgeline') >= 0) return 'Subject: Following up on your rewire estimate (EST-1014)\n\nHi James,\n\nCircling back on the $24,000 full-building rewire we quoted. We can still hold a crew slot that fits your timeline, but it\'s filling for next month. Happy to walk the scope or adjust anything that helps you move forward — would a quick call this week work?\n\nBest,\n' + Store.state().settings.business.name + '\n\n— Demo reply. Add your Anthropic API key (see README) for live drafts.';
     if (m.indexOf('focus') >= 0 || m.indexOf('today') >= 0 || m.indexOf('prior') >= 0) return 'Here\'s how I\'d rank today:\n\n1. Ridgeline EST-1014 ($24k) — 6 days cold, your biggest open deal. Send the follow-up first.\n2. Mesa Industrial ($18k lead) — never contacted. One call could open a big account.\n3. CoreLink INV-2008 ($3.2k) — overdue. Quick reminder while you\'re in your inbox.\n\nJobs today: Hartman 9 AM, Bloom 1 PM — both assigned.\n\n— Demo reply. Add your API key for live help.';
     if (m.indexOf('business') >= 0 || m.indexOf('doing') >= 0 || m.indexOf('month') >= 0) { var k = Store.kpis(); return 'This month:\n\n• Revenue: ' + money(k.revenueMTD) + '\n• Pipeline: ' + money(k.pipelineValue) + ' across ' + k.openDeals + ' open deals\n• Outstanding: ' + money(k.outstanding) + '\n• Win rate: ' + k.winRate + '%\n\nBiggest lever: collect the overdue invoices and close Ridgeline.\n\n— Demo reply. Add your API key for live numbers.'; }
     if (m.indexOf('lead') >= 0 || m.indexOf('call') >= 0) return 'Call these first:\n\n1. Mesa Industrial — $18k, brand-new and uncontacted. Lead with a free site walkthrough.\n2. Sunridge HOA — $9.5k lighting. Board referral, warm.\n3. Peak Fitness — existing client, easy re-engage on the panel upgrade.\n\n— Demo reply. Add your API key for tailored outreach.';
@@ -399,7 +407,7 @@
     var ta = document.getElementById('ai-in'); text = text || (ta && ta.value.trim()); if (!text) return;
     if (ta) { ta.value = ''; ta.style.height = 'auto'; }
     aiPush(text, 'me'); var thinking = aiPush('Thinking…', 'bot');
-    var sys = 'You are Viper, the built-in assistant for Viper Electric (small electrical contractor, Coeur d\'Alene ID). Be direct and useful. When asked to draft an email, write it ready to send with a subject line first. Business snapshot: ' + AI_CTX();
+    var sys = 'You are the built-in assistant for ' + Store.state().settings.business.name + ', an electrical contractor serving Kootenai & Bonner County, ID. Be direct and useful. When asked to draft an email, write it ready to send with a subject line first. Business snapshot: ' + AI_CTX();
     fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, system: sys }) })
       .then(function (r) { if (!r.ok) throw new Error('no backend'); return r.json(); })
       .then(function (data) { thinking.querySelector('.ai-bubble').textContent = data.reply || offlineReply(text); })
@@ -657,11 +665,15 @@
   A['save-settings'] = function () {
     var s = Store.state(); var g = function (id) { var e = document.getElementById(id); return e ? e.value : ''; };
     s.settings.business.name = g('set-name'); s.settings.business.phone = g('set-phone'); s.settings.business.email = g('set-email');
-    s.settings.business.address = g('set-addr'); s.settings.taxRate = parseFloat(g('set-tax')) || 0; Store.save();
+    s.settings.business.address = g('set-addr'); s.settings.taxRate = parseFloat(g('set-tax')) || 0;
+    s.settings.business.owners = g('set-owners'); s.settings.business.serviceArea = g('set-area');
+    s.settings.business.hours = g('set-hours'); s.settings.business.warranty = g('set-warranty'); s.settings.business.emergency = g('set-emergency');
+    var vet = document.getElementById('set-vet'); s.settings.business.veteranDiscount = !!(vet && vet.checked);
+    Store.save();
     document.querySelector('.brand-name').textContent = s.settings.business.name; App.toast('Settings saved.');
   };
   A['add-member'] = function () {
-    App.openModal('Add team member', '<div class="form-grid">' + field('Name', input('tm-name', 'placeholder="Full name"')) + field('Role', input('tm-role', 'placeholder="e.g. Field Tech"')) + '</div>' + field('Email', input('tm-email', 'placeholder="name@viperelectric.com"')),
+    App.openModal('Add team member', '<div class="form-grid">' + field('Name', input('tm-name', 'placeholder="Full name"')) + field('Role', input('tm-role', 'placeholder="e.g. Field Tech"')) + '</div>' + field('Email', input('tm-email', 'placeholder="name@viprelectric208.com"')),
       btn('Cancel', { action: 'close-modal' }) + btn('Send invite', { variant: 'brand', action: 'create-member' }));
   };
   A['create-member'] = function () {
@@ -672,10 +684,10 @@
   A['remove-member'] = function (el, d) { Store.remove('team', d.id); App.refresh(); App.toast('Member removed.'); };
   A['connect-integration'] = function (el, d) { App.toast(d.name + ' — connect flow coming from your backend. See README.', 'info'); };
   A['reset-data'] = function () {
-    App.openModal('Reset all data?', '<p class="muted">This clears everything you\'ve added on this device and restores the sample data. Can\'t be undone.</p>',
+    App.openModal('Load starter data?', '<p class="muted">This replaces the current records with the Vipr Electric starter set (real services, team, and branding) and syncs it to your cloud. Do this once to brand your live workspace. Can\'t be undone.</p>',
       btn('Cancel', { action: 'close-modal' }) + btn('Reset everything', { variant: 'brand', action: 'reset-confirm' }));
   };
-  A['reset-confirm'] = function () { Store.resetAll(); App.closeModal(); App.go('home'); App.toast('Reset to sample data.'); };
+  A['reset-confirm'] = function () { Store.resetAll(); App.closeModal(); App.go('home'); App.toast('Loaded Vipr Electric starter data.'); };
 
   /* ai */
   A['ai-send'] = function () { aiSend(); };
