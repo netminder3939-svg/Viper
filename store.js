@@ -507,6 +507,7 @@
   }
 
   function exportData() { return JSON.stringify(state, null, 2); }
+  function ensureShape() { try { state = migrate(state); } catch (e) {} return state; }
   function importData(objOrStr) {
     try {
       var obj = typeof objOrStr === 'string' ? JSON.parse(objOrStr) : objOrStr;
@@ -530,7 +531,7 @@
     jobsForTech: jobsForTech, jobsForContact: jobsForContact,
     timesheetsForJob: timesheetsForJob, openTimesheet: openTimesheet, jobLaborMinutes: jobLaborMinutes,
     jobProfit: jobProfit, profitByJob: profitByJob, arAging: arAging,
-    runAutomations: runAutomations, exportData: exportData, importData: importData, mrr: mrr
+    runAutomations: runAutomations, exportData: exportData, importData: importData, mrr: mrr, ensureShape: ensureShape
   };
   global.Store = Store;
 })(typeof window !== 'undefined' ? window : this);
