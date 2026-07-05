@@ -1,0 +1,10 @@
+{
+  "name": "viper-os",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Viper OS — unified operations platform (CRM, pipeline, jobs, estimates, invoices, inbox, automations) for a field-service business.",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve ."
+  }
+}

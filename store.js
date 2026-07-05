@@ -13,7 +13,7 @@
   function uid(p) { return (p || 'id') + '_' + Math.random().toString(36).slice(2, 9); }
   var NOW = new Date();
   function dayShift(n) { var d = new Date(NOW); d.setDate(d.getDate() + n); return d; }
-  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function iso(d) { return d.toISOString().slice(0, 10); }
   function nowISO() { return new Date().toISOString(); }
   // compact captioned placeholder "photo" (SVG data URL) so galleries look alive without heavy binaries
   function svgPhoto(label, c1, c2) {
@@ -30,15 +30,15 @@
     ];
 
     var contacts = [
-      { id: 'c_hart', name: 'Sarah Hartman', company: 'Hartman Residence', email: 's.hartman@email.com', phone: '(208) 555-2148', type: 'Residential', stage: 'customer', owner: 'u_ops', address: '14 Lakeshore Dr, Coeur d\'Alene, ID', tags: ['panel', 'repeat'], source: 'Referral', createdAt: iso(dayShift(-120)), lastContact: iso(NOW) },
-      { id: 'c_bloom', name: 'Derek Bloom', company: 'Bloom Electric Co.', email: 'derek@bloomco.com', phone: '(208) 555-3394', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '88 Industry Way, Post Falls, ID', tags: ['ev', 'partner'], source: 'Referral', createdAt: iso(dayShift(-86)), lastContact: iso(dayShift(-1)) },
-      { id: 'c_ridge', name: 'James Ridge', company: 'Ridgeline Commercial', email: 'james@ridgeline.com', phone: '(208) 555-4277', type: 'Commercial', stage: 'prospect', owner: 'u_owner', address: '2200 Seltice Way, Post Falls, ID', tags: ['rewire', 'big'], source: 'Email', createdAt: iso(dayShift(-30)), lastContact: iso(dayShift(-6)) },
-      { id: 'c_vista', name: 'Maria Torres', company: 'Vista Medical Center', email: 'm.torres@vistamed.com', phone: '(208) 555-5166', type: 'Commercial', stage: 'prospect', owner: 'u_ops', address: '500 Health Pkwy, Coeur d\'Alene, ID', tags: ['generator'], source: 'Phone call', createdAt: iso(dayShift(-12)), lastContact: iso(dayShift(-2)) },
-      { id: 'c_core', name: 'CoreLink Properties', company: 'CoreLink Properties', email: 'ap@corelink.com', phone: '(208) 555-6033', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '1 Riverstone Dr, Coeur d\'Alene, ID', tags: ['property-mgmt'], source: 'Referral', createdAt: iso(dayShift(-200)), lastContact: iso(dayShift(-3)) },
-      { id: 'c_mesa', name: 'Mesa Industrial Park', company: 'Mesa Industrial', email: 'ops@mesaindustrial.com', phone: '(208) 555-7884', type: 'Industrial', stage: 'lead', owner: 'u_ops', address: '4100 Ramsey Rd, Hayden, ID', tags: ['assessment', 'hot'], source: 'Website CTA', createdAt: iso(dayShift(-4)), lastContact: null },
-      { id: 'c_harbor', name: 'Harbor Lofts HOA', company: 'Harbor Lofts', email: 'mgmt@harborlofts.com', phone: '(208) 555-8821', type: 'Residential', stage: 'customer', owner: 'u_ops', address: '70 Marina Blvd, Coeur d\'Alene, ID', tags: ['hoa'], source: 'Manual entry', createdAt: iso(dayShift(-60)), lastContact: iso(dayShift(-5)) },
-      { id: 'c_peak', name: 'Peak Fitness', company: 'Peak Fitness', email: 'owner@peakfit.com', phone: '(208) 555-9540', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '300 Government Way, Coeur d\'Alene, ID', tags: ['panel'], source: 'Phone call', createdAt: iso(dayShift(-150)), lastContact: iso(dayShift(-15)) },
-      { id: 'c_sun', name: 'Sunridge HOA', company: 'Sunridge HOA', email: 'board@sunridge.org', phone: '(208) 555-1190', type: 'Residential', stage: 'lead', owner: 'u_ops', address: '15 Sunridge Loop, Hayden, ID', tags: ['lighting'], source: 'Referral', createdAt: iso(dayShift(-3)), lastContact: null }
+      { id: 'c_hart', name: 'Sarah Hartman', company: 'Hartman Residence', email: 's.hartman@email.com', phone: '(208) 555-2148', type: 'Residential', stage: 'customer', owner: 'u_ops', address: '14 Lakeshore Dr, Coeur d\'Alene, ID', tags: ['panel', 'repeat'], createdAt: iso(dayShift(-120)), lastContact: iso(NOW) },
+      { id: 'c_bloom', name: 'Derek Bloom', company: 'Bloom Electric Co.', email: 'derek@bloomco.com', phone: '(208) 555-3394', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '88 Industry Way, Post Falls, ID', tags: ['ev', 'partner'], createdAt: iso(dayShift(-86)), lastContact: iso(dayShift(-1)) },
+      { id: 'c_ridge', name: 'James Ridge', company: 'Ridgeline Commercial', email: 'james@ridgeline.com', phone: '(208) 555-4277', type: 'Commercial', stage: 'prospect', owner: 'u_owner', address: '2200 Seltice Way, Post Falls, ID', tags: ['rewire', 'big'], createdAt: iso(dayShift(-30)), lastContact: iso(dayShift(-6)) },
+      { id: 'c_vista', name: 'Maria Torres', company: 'Vista Medical Center', email: 'm.torres@vistamed.com', phone: '(208) 555-5166', type: 'Commercial', stage: 'prospect', owner: 'u_ops', address: '500 Health Pkwy, Coeur d\'Alene, ID', tags: ['generator'], createdAt: iso(dayShift(-12)), lastContact: iso(dayShift(-2)) },
+      { id: 'c_core', name: 'CoreLink Properties', company: 'CoreLink Properties', email: 'ap@corelink.com', phone: '(208) 555-6033', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '1 Riverstone Dr, Coeur d\'Alene, ID', tags: ['property-mgmt'], createdAt: iso(dayShift(-200)), lastContact: iso(dayShift(-3)) },
+      { id: 'c_mesa', name: 'Mesa Industrial Park', company: 'Mesa Industrial', email: 'ops@mesaindustrial.com', phone: '(208) 555-7884', type: 'Industrial', stage: 'lead', owner: 'u_ops', address: '4100 Ramsey Rd, Hayden, ID', tags: ['assessment', 'hot'], createdAt: iso(dayShift(-4)), lastContact: null },
+      { id: 'c_harbor', name: 'Harbor Lofts HOA', company: 'Harbor Lofts', email: 'mgmt@harborlofts.com', phone: '(208) 555-8821', type: 'Residential', stage: 'customer', owner: 'u_ops', address: '70 Marina Blvd, Coeur d\'Alene, ID', tags: ['hoa'], createdAt: iso(dayShift(-60)), lastContact: iso(dayShift(-5)) },
+      { id: 'c_peak', name: 'Peak Fitness', company: 'Peak Fitness', email: 'owner@peakfit.com', phone: '(208) 555-9540', type: 'Commercial', stage: 'customer', owner: 'u_owner', address: '300 Government Way, Coeur d\'Alene, ID', tags: ['panel'], createdAt: iso(dayShift(-150)), lastContact: iso(dayShift(-15)) },
+      { id: 'c_sun', name: 'Sunridge HOA', company: 'Sunridge HOA', email: 'board@sunridge.org', phone: '(208) 555-1190', type: 'Residential', stage: 'lead', owner: 'u_ops', address: '15 Sunridge Loop, Hayden, ID', tags: ['lighting'], createdAt: iso(dayShift(-3)), lastContact: null }
     ];
 
     var deals = [
@@ -120,7 +120,25 @@
 
     var settings = {
       business: { name: 'Viper Electric', tagline: 'Licensed & insured · Coeur d\'Alene, ID', phone: '(208) 555-0100', email: 'office@viperelectric.com', address: '123 Commerce Dr, Coeur d\'Alene, ID 83814' },
-      branding: { primary: '#4f46e5', logo: null, emailFooter: 'Viper Electric · (208) 555-0100 · Licensed & insured · Coeur d\'Alene, ID' },
+      branding: { primary: '#4f46e5', accent: '#06b6d4', logo: null, favicon: null, welcome: 'Here\'s what\'s happening today.', loginTagline: 'Operations, sales, and dispatch in one place.', emailFooter: 'Viper Electric · (208) 555-0100 · Licensed & insured · Coeur d\'Alene, ID' },
+      services: [
+        { id: 'svc_host', name: 'Website Hosting', category: 'Web', price: 49, active: true, desc: 'Fast, secure hosting with SSL and backups.' },
+        { id: 'svc_maint', name: 'Website Maintenance', category: 'Web', price: 99, active: false, desc: 'Updates, edits, and monitoring each month.' },
+        { id: 'svc_seo', name: 'SEO', category: 'Marketing', price: 499, active: false, desc: 'Rank higher and pull in organic leads.' },
+        { id: 'svc_lseo', name: 'Local SEO', category: 'Marketing', price: 299, active: true, desc: 'Own the map pack in your service area.' },
+        { id: 'svc_gbp', name: 'Google Business Profile', category: 'Marketing', price: 199, active: false, desc: 'Managed posts, photos, and Q&A.' },
+        { id: 'svc_rep', name: 'Reputation Management', category: 'Marketing', price: 149, active: false, desc: 'Collect reviews and respond automatically.' },
+        { id: 'svc_email', name: 'Email Marketing', category: 'Marketing', price: 199, active: false, desc: 'Campaigns, sequences, and broadcasts.' },
+        { id: 'svc_blog', name: 'Blog Writing', category: 'Content', price: 299, active: false, desc: 'Fresh SEO articles every month.' },
+        { id: 'svc_ai', name: 'AI Content', category: 'Content', price: 99, active: false, desc: 'On-demand AI copy for any channel.' },
+        { id: 'svc_lp', name: 'Landing Pages', category: 'Web', price: 149, active: false, desc: 'High-converting pages for campaigns.' },
+        { id: 'svc_funnel', name: 'Funnel Management', category: 'Web', price: 299, active: false, desc: 'Built and optimized sales funnels.' },
+        { id: 'svc_analytics', name: 'Monthly Analytics', category: 'Reporting', price: 99, active: true, desc: 'A clear report of what\'s working.' },
+        { id: 'svc_leads', name: 'Lead Generation', category: 'Marketing', price: 599, active: false, desc: 'Done-for-you lead campaigns.' },
+        { id: 'svc_auto', name: 'Automation Services', category: 'Ops', price: 199, active: false, desc: 'Custom workflows that save hours.' },
+        { id: 'svc_forms', name: 'Online Forms', category: 'Ops', price: 49, active: false, desc: 'Branded intake and survey forms.' },
+        { id: 'svc_booking', name: 'Appointment Booking', category: 'Ops', price: 79, active: false, desc: 'Online scheduling for your calendar.' }
+      ],
       taxRate: 6.0,
       terms: 'Net 30',
       notifRead: false,
@@ -233,7 +251,12 @@
     var st = s.settings;
     if (!st.branding) st.branding = { primary: '#4f46e5' };
     if (st.branding.logo === undefined) st.branding.logo = null;
+    if (st.branding.accent === undefined) st.branding.accent = '#06b6d4';
+    if (st.branding.favicon === undefined) st.branding.favicon = null;
+    if (st.branding.welcome === undefined) st.branding.welcome = 'Here\'s what\'s happening today.';
+    if (st.branding.loginTagline === undefined) st.branding.loginTagline = 'Operations, sales, and dispatch in one place.';
     if (st.branding.emailFooter === undefined) st.branding.emailFooter = b.settings.branding.emailFooter;
+    if (!st.services) st.services = b.settings.services;
     if (!st.dashboard) st.dashboard = b.settings.dashboard.slice();
     if (!st.stageAutomation) st.stageAutomation = b.settings.stageAutomation;
     if (!s.templates || !s.templates.length) s.templates = b.templates;
@@ -242,7 +265,6 @@
     if (!s.requests) s.requests = [];
     if (!s.timesheets) s.timesheets = [];
     (s.team || []).forEach(function (m) { if (m.hourlyCost === undefined) m.hourlyCost = 50; });
-    (s.contacts || []).forEach(function (c) { if (!c.source) c.source = 'Manual entry'; });
     (s.jobs || []).forEach(function (j) {
       if (!j.photos) j.photos = [];
       if (!j.costs) j.costs = [];
@@ -479,6 +501,11 @@
   }
 
   /* ---- backup / restore ----------------------------------------- */
+  function mrr() {
+    var s = (state.settings && state.settings.services) || [];
+    return s.filter(function (x) { return x.active; }).reduce(function (t, x) { return t + (x.price || 0); }, 0);
+  }
+
   function exportData() { return JSON.stringify(state, null, 2); }
   function importData(objOrStr) {
     try {
@@ -503,7 +530,7 @@
     jobsForTech: jobsForTech, jobsForContact: jobsForContact,
     timesheetsForJob: timesheetsForJob, openTimesheet: openTimesheet, jobLaborMinutes: jobLaborMinutes,
     jobProfit: jobProfit, profitByJob: profitByJob, arAging: arAging,
-    runAutomations: runAutomations, exportData: exportData, importData: importData
+    runAutomations: runAutomations, exportData: exportData, importData: importData, mrr: mrr
   };
   global.Store = Store;
 })(typeof window !== 'undefined' ? window : this);

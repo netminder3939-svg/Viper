@@ -241,10 +241,6 @@ body { font-family: var(--sans); background: var(--canvas); color: var(--t1); -w
 .cal-cell.sel { border-color: var(--brand); background: rgba(79,70,229,.06); }
 .cal-dots { margin-top: auto; display: flex; gap: 3px; }
 .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); }
-.cal-dot-done { background: var(--t3); opacity: .5; }
-.cal-job-done { opacity: .55; }
-.cal-job-done .lr-title { text-decoration: line-through; }
-.cal-job-done .ic { width: 14px; height: 14px; color: var(--ok); vertical-align: -2px; margin-right: 2px; }
 
 /* ===== INBOX ===== */
 .inbox { display: grid; grid-template-columns: 340px 1fr; gap: 18px; height: calc(100vh - 150px); }
@@ -737,3 +733,18 @@ body.mode-field #field-nav, body.mode-portal #portal-nav { display: flex; positi
 .auth-tab.on { background: var(--surface); color: var(--t1); box-shadow: var(--shadow); }
 .auth-alt { margin-top: 12px; font-size: 12.5px; color: var(--t3); min-height: 16px; text-align: center; }
 .auth-alt.err { color: var(--bad); }
+
+/* ---- Services & Upgrades (upsell) ---- */
+.svc-cat-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--t3); font-weight: 700; margin: 20px 4px 10px; }
+.svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.svc-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; transition: .15s; }
+.svc-card.on { border-color: color-mix(in srgb, var(--brand) 45%, var(--line)); box-shadow: 0 6px 18px rgba(79,70,229,.1); }
+.svc-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.svc-name { font-weight: 700; font-size: 14.5px; }
+.svc-desc { font-size: 12.5px; color: var(--t3); line-height: 1.5; margin: 8px 0 14px; flex: 1; }
+.svc-foot { display: flex; align-items: center; justify-content: space-between; }
+.svc-price { font-size: 18px; font-weight: 700; }
+.svc-price small { font-size: 11px; color: var(--t3); font-weight: 500; }
+.svc-add { font-size: 12.5px; font-weight: 600; color: var(--brand); cursor: pointer; }
+.svc-add:hover { text-decoration: underline; }
+.dash-welcome { font-size: 15px; font-weight: 600; color: var(--t2); margin-bottom: 12px; }

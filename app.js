@@ -21,14 +21,14 @@
     return '$' + n;
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
-  function fmtDate(s) { if (!s) return '—'; var d = new Date(s.length === 10 ? s + 'T12:00:00' : s); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
-  function fmtDateY(s) { if (!s) return '—'; var d = new Date(s.length === 10 ? s + 'T12:00:00' : s); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+  function fmtDate(s) { if (!s) return '—'; var d = new Date(s); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+  function fmtDateY(s) { if (!s) return '—'; var d = new Date(s); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
   function fmtTime(t) { if (!t) return ''; var p = t.split(':'); var h = +p[0], m = p[1]; var ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + m + ' ' + ap; }
   function relDay(s) {
     if (!s) return '—';
     var today = Store.iso(Store.now);
     if (s === today) return 'Today';
-    var d = new Date(s + 'T12:00:00'), n = new Date(today + 'T12:00:00');
+    var d = new Date(s), n = new Date(today);
     var diff = Math.round((d - n) / 86400000);
     if (diff === 1) return 'Tomorrow'; if (diff === -1) return 'Yesterday';
     if (diff > 1 && diff < 7) return 'In ' + diff + ' days';
@@ -290,6 +290,9 @@
       { id: 'templates', label: 'Messages', icon: 'megaphone' },
       { id: 'outbox', label: 'Outbox', icon: 'send' }
     ] },
+    { group: 'Grow', items: [
+      { id: 'services', label: 'Services & Upgrades', icon: 'coins' }
+    ] },
     { group: '', items: [
       { id: 'settings', label: 'Settings', icon: 'settings' }
     ] }
@@ -305,6 +308,7 @@
     requests: ['Requests', 'New work coming in from your Client Hub'],
     timesheets: ['Timesheets', 'Hours logged in the field'],
     catalog: ['Price book', 'Reusable priced services with your margins'],
+    services: ['Services & Upgrades', 'Managed services you can turn on and bill'],
     settings: ['Settings', 'Business, branding, and team']
   };
 

@@ -78,13 +78,12 @@
 
   /* ================= CONTACTS ================= */
   function contactRows(list) {
-    if (!list.length) return '<tr><td colspan="7">' + empty('No contacts match.', 'Add contact', 'new-contact') + '</td></tr>';
+    if (!list.length) return '<tr><td colspan="6">' + empty('No contacts match.', 'Add contact', 'new-contact') + '</td></tr>';
     return list.map(function (c) {
       var owner = Store.teamMember(c.owner);
       return '<tr class="rowlink" data-action="open-record" data-type="contact" data-id="' + c.id + '">' +
         '<td><div class="cell-id">' + avatar(c.name, 30) + '<div><div class="cell-name">' + esc(c.name) + '</div><div class="cell-sub">' + esc(c.company || '') + '</div></div></div></td>' +
         '<td>' + esc(c.type) + '</td><td>' + statusPill(c.stage) + '</td><td class="mono muted">' + esc(c.phone) + '</td>' +
-        '<td class="muted">' + esc(c.source || '—') + '</td>' +
         '<td>' + (owner ? avatar(owner.name, 24, owner.color) : '—') + '</td><td class="muted">' + esc(c.lastContact ? f.relDay(c.lastContact) : 'Never') + '</td></tr>';
     }).join('');
   }
@@ -92,19 +91,17 @@
     render: function () {
       var toolbar = '<div class="toolbar"><div class="search-inp">' + icon('search') + '<input id="contact-search" placeholder="Search name, company, phone…"></div>' +
         '<div class="chips" id="contact-chips">' + ['All', 'Residential', 'Commercial', 'Industrial'].map(function (t, i) { return '<button class="chip' + (i === 0 ? ' on' : '') + '" data-type-filter="' + (i === 0 ? '' : t) + '">' + t + '</button>'; }).join('') + '</div>' +
-        '<div class="chips" id="source-chips">' + ['All sources', 'Website CTA', 'Manual entry', 'Phone call', 'Email', 'Referral'].map(function (t, i) { return '<button class="chip' + (i === 0 ? ' on' : '') + '" data-source-filter="' + (i === 0 ? '' : t) + '">' + t + '</button>'; }).join('') + '</div>' +
         btn('Add contact', { variant: 'brand', sm: true, action: 'new-contact' }) + '</div>';
-      return toolbar + card('<table class="tbl"><thead><tr><th>Name</th><th>Type</th><th>Stage</th><th>Phone</th><th>Source</th><th>Owner</th><th>Last contact</th></tr></thead><tbody id="contact-rows">' + contactRows(Store.all('contacts')) + '</tbody></table>', 'nopad rise');
+      return toolbar + card('<table class="tbl"><thead><tr><th>Name</th><th>Type</th><th>Stage</th><th>Phone</th><th>Owner</th><th>Last contact</th></tr></thead><tbody id="contact-rows">' + contactRows(Store.all('contacts')) + '</tbody></table>', 'nopad rise');
     },
     mount: function () {
-      var s = document.getElementById('contact-search'); var typeF = '', sourceF = '', q = '';
+      var s = document.getElementById('contact-search'); var typeF = '', q = '';
       function apply() {
-        var list = Store.all('contacts').filter(function (c) { return (!typeF || c.type === typeF) && (!sourceF || c.source === sourceF) && (!q || (c.name + ' ' + c.company + ' ' + c.phone + ' ' + c.email).toLowerCase().indexOf(q) >= 0); });
+        var list = Store.all('contacts').filter(function (c) { return (!typeF || c.type === typeF) && (!q || (c.name + ' ' + c.company + ' ' + c.phone + ' ' + c.email).toLowerCase().indexOf(q) >= 0); });
         document.getElementById('contact-rows').innerHTML = contactRows(list);
       }
       if (s) s.addEventListener('input', function () { q = s.value.toLowerCase(); apply(); });
       document.getElementById('contact-chips').addEventListener('click', function (e) { var b = e.target.closest('.chip'); if (!b) return; Array.prototype.forEach.call(this.children, function (c) { c.classList.remove('on'); }); b.classList.add('on'); typeF = b.getAttribute('data-type-filter'); apply(); });
-      document.getElementById('source-chips').addEventListener('click', function (e) { var b = e.target.closest('.chip'); if (!b) return; Array.prototype.forEach.call(this.children, function (c) { c.classList.remove('on'); }); b.classList.add('on'); sourceF = b.getAttribute('data-source-filter'); apply(); });
     }
   };
   function contactDrawer(id) {
@@ -115,7 +112,7 @@
     var owner = Store.teamMember(c.owner);
     function relList(title, arr, r2) { return arr.length ? '<div class="dr-sec">' + esc(title) + '</div>' + arr.map(r2).join('') : ''; }
     var body = '<div class="dr-fields">' + drf('Company', esc(c.company)) + drf('Email', esc(c.email)) + drf('Phone', '<span class="mono">' + esc(c.phone) + '</span>') +
-      drf('Type', esc(c.type)) + drf('Source', esc(c.source || '—')) + drf('Owner', owner ? esc(owner.name) : '—') + drf('Address', esc(c.address || '—')) + '</div>' +
+      drf('Type', esc(c.type)) + drf('Owner', owner ? esc(owner.name) : '—') + drf('Address', esc(c.address || '—')) + '</div>' +
       (c.tags && c.tags.length ? '<div class="tagrow">' + c.tags.map(function (t) { return pill(t, 'soft'); }).join('') + '</div>' : '') +
       relList('Deals', deals, function (d) { return '<div class="dr-rel" data-action="open-record" data-type="deal" data-id="' + d.id + '"><span>' + esc(d.title) + '</span><span class="mono">' + money(d.value) + '</span></div>'; }) +
       relList('Jobs', jobs, function (j) { return '<div class="dr-rel" data-action="open-record" data-type="job" data-id="' + j.id + '"><span>' + esc(j.title) + '</span>' + statusPill(j.status) + '</div>'; }) +
@@ -173,7 +170,7 @@
           var m = Store.teamMember(j.assignedTo);
           return '<div class="deal" draggable="true" data-id="' + j.id + '" data-action="open-record" data-type="job">' +
             '<div class="deal-title">' + esc(j.title) + '</div><div class="lr-sub">' + esc(Store.contactName(j.contactId)) + '</div>' +
-            '<div class="deal-meta"><span class="mono muted">' + (j.date ? esc(f.relDay(j.date)) + ' · ' + esc(f.fmtTime(j.time)) : 'Unscheduled') + '</span>' + (m ? avatar(m.name, 22, m.color) : '') + '</div>' +
+            '<div class="deal-meta"><span class="mono muted">' + esc(f.relDay(j.date)) + ' · ' + esc(f.fmtTime(j.time)) + '</span>' + (m ? avatar(m.name, 22, m.color) : '') + '</div>' +
             '<div class="kmove"><button class="kbtn" ' + (idx === 0 ? 'disabled' : '') + ' data-action="move-job" data-id="' + j.id + '" data-dir="-1">' + icon('arrowL') + '</button>' +
             '<button class="kbtn" ' + (idx === JSTAGES.length - 1 ? 'disabled' : '') + ' data-action="move-job" data-id="' + j.id + '" data-dir="1">' + icon('arrowR') + '</button></div></div>';
         }).join('');
@@ -187,7 +184,7 @@
     var j = Store.get('jobs', id); if (!j) return;
     var c = Store.get('contacts', j.contactId), m = Store.teamMember(j.assignedTo);
     var body = '<div class="dr-fields">' + drf('Client', c ? '<span class="link" data-action="open-record" data-type="contact" data-id="' + c.id + '">' + esc(c.name) + '</span>' : '—') +
-      drf('When', j.date ? esc(f.fmtDateY(j.date)) + ' · ' + esc(f.fmtTime(j.time)) : '<span class="muted">Unscheduled</span>') + drf('Assigned', m ? esc(m.name) : 'Unassigned') +
+      drf('When', esc(f.fmtDateY(j.date)) + ' · ' + esc(f.fmtTime(j.time))) + drf('Assigned', m ? esc(m.name) : 'Unassigned') +
       drf('Address', esc(j.address || '—')) + drf('Status', statusPill(j.status)) + '</div>' +
       (j.items && j.items.length ? lineItemsBlock(j.items) : '') + (j.notes ? '<div class="dr-sec">Notes</div><p class="dr-note">' + esc(j.notes) + '</p>' : '');
     var actions = '';
@@ -210,7 +207,7 @@
       for (var d = 1; d <= days; d++) {
         var ds = cal.y + '-' + String(cal.m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
         var evs = byDay[ds] || []; var isToday = ds === Store.iso(Store.now);
-        var dots = evs.slice(0, 3).map(function (j) { return '<span class="cal-dot' + (j.status === 'complete' || j.status === 'invoiced' ? ' cal-dot-done' : '') + '"></span>'; }).join('');
+        var dots = evs.slice(0, 3).map(function () { return '<span class="cal-dot"></span>'; }).join('');
         cells += '<div class="cal-cell' + (isToday ? ' today' : '') + (ds === cal.sel ? ' sel' : '') + '" data-action="cal-day" data-day="' + ds + '"><span class="cal-n mono">' + d + '</span><div class="cal-dots">' + dots + '</div></div>';
       }
       var calCard = card('<div class="cal-nav"><button class="icon-btn" data-action="cal-prev">' + icon('chevL') + '</button><h2>' + mn[cal.m] + ' ' + cal.y + '</h2><button class="icon-btn" data-action="cal-next">' + icon('chevR') + '</button></div>' +
@@ -218,8 +215,7 @@
       var selEvs = (byDay[cal.sel] || []).sort(function (a, b) { return (a.time || '') < (b.time || '') ? -1 : 1; });
       var side = card(sectionTitle(f.fmtDateY(cal.sel)) + (selEvs.length ? selEvs.map(function (j) {
         var m = Store.teamMember(j.assignedTo);
-        var isDone = j.status === 'complete' || j.status === 'invoiced';
-        return '<div class="line-row' + (isDone ? ' cal-job-done' : '') + '" data-action="edit-job" data-id="' + j.id + '"><div class="lr-time mono">' + esc(f.fmtTime(j.time)) + '</div><div class="lr-main"><div class="lr-title">' + (isDone ? icon('check') + ' ' : '') + esc(j.title) + '</div><div class="lr-sub">' + esc(Store.contactName(j.contactId)) + ' · ' + statusPill(j.status) + '</div></div>' + (m ? avatar(m.name, 24, m.color) : '') + '</div>';
+        return '<div class="line-row" data-action="open-record" data-type="job" data-id="' + j.id + '"><div class="lr-time mono">' + esc(f.fmtTime(j.time)) + '</div><div class="lr-main"><div class="lr-title">' + esc(j.title) + '</div><div class="lr-sub">' + esc(Store.contactName(j.contactId)) + '</div></div>' + (m ? avatar(m.name, 24, m.color) : '') + '</div>';
       }).join('') : empty('Nothing scheduled.', 'New job', 'new-job')), 'rise');
       return '<div class="cal-wrap">' + calCard + side + '</div>';
     }
@@ -512,14 +508,13 @@
     var body = '<div class="form-grid">' + field('Name', input('nc-name', 'placeholder="Full name"')) + field('Company', input('nc-co', 'placeholder="Company"')) +
       field('Email', input('nc-em', 'placeholder="email@…"')) + field('Phone', input('nc-ph', 'placeholder="(208) …"')) +
       field('Type', '<select class="inp" id="nc-type"><option>Residential</option><option>Commercial</option><option>Industrial</option></select>') +
-      field('Stage', '<select class="inp" id="nc-stage"><option value="lead">Lead</option><option value="prospect">Prospect</option><option value="customer">Customer</option></select>') + '</div>' +
-      '<div class="form-grid">' + field('Source', '<select class="inp" id="nc-source"><option>Manual entry</option><option>Website CTA</option><option>Phone call</option><option>Email</option><option>Referral</option><option>Other</option></select>') + field('Address', input('nc-addr', 'placeholder="Street, City"')) + '</div>';
+      field('Stage', '<select class="inp" id="nc-stage"><option value="lead">Lead</option><option value="prospect">Prospect</option><option value="customer">Customer</option></select>') + '</div>' + field('Address', input('nc-addr', 'placeholder="Street, City"'));
     App.openModal('New contact', body, btn('Cancel', { action: 'close-modal' }) + btn('Save contact', { variant: 'brand', action: 'create-contact' }));
   };
   A['create-contact'] = function () {
     var g = function (id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; };
     var name = g('nc-name'); if (!name) { App.toast('Add a name first.', 'error'); return; }
-    var c = Store.insert('contacts', { name: name, company: g('nc-co') || name, email: g('nc-em') || '—', phone: g('nc-ph') || '—', type: g('nc-type') || 'Residential', stage: document.getElementById('nc-stage').value, source: g('nc-source') || 'Manual entry', owner: 'u_ops', address: g('nc-addr'), tags: [], createdAt: Store.iso(Store.now), lastContact: Store.iso(Store.now) }, true);
+    var c = Store.insert('contacts', { name: name, company: g('nc-co') || name, email: g('nc-em') || '—', phone: g('nc-ph') || '—', type: g('nc-type') || 'Residential', stage: document.getElementById('nc-stage').value, owner: 'u_ops', address: g('nc-addr'), tags: [], createdAt: Store.iso(Store.now), lastContact: Store.iso(Store.now) }, true);
     Store.logActivity('lead', 'New contact added — ' + name);
     App.closeModal(); App.toast(name + ' saved to contacts.'); App.go('contacts'); setTimeout(function () { openRecord('contact', c.id); }, 80);
   };
@@ -555,35 +550,13 @@
   A['create-job'] = function () {
     var title = document.getElementById('nj-title').value.trim(); if (!title) { App.toast('Add a title.', 'error'); return; }
     var cid = document.getElementById('nj-contact').value, val = +document.getElementById('nj-val').value || 0;
-    var assignId = document.getElementById('nj-assign').value;
-    var tech = Store.teamMember(assignId);
-    Store.insert('jobs', { title: title, contactId: cid, value: val, status: 'scheduled', assignedTo: assignId, date: document.getElementById('nj-date').value, time: document.getElementById('nj-time').value, address: (Store.get('contacts', cid) || {}).address || '', notes: document.getElementById('nj-notes').value.trim(), items: val ? [{ desc: title, qty: 1, rate: val }] : [] }, true);
-    // send confirmation with agent name
-    var bookedTpl = Store.templateForEvent('job_booked');
-    if (bookedTpl) {
-      var c2 = Store.get('contacts', cid);
-      var rendered = Store.renderTemplate(bookedTpl, { client_name: c2 ? c2.name : '', tech_name: tech ? tech.name : 'Your technician', job_title: title, date: f.fmtDateY(document.getElementById('nj-date').value), time: f.fmtTime(document.getElementById('nj-time').value), address: (c2 || {}).address || '' });
-      Store.recordOutbox({ contactId: cid, channel: bookedTpl.channel, templateId: bookedTpl.id, subject: rendered.subject, body: rendered.body });
-    }
+    Store.insert('jobs', { title: title, contactId: cid, value: val, status: 'scheduled', assignedTo: document.getElementById('nj-assign').value, date: document.getElementById('nj-date').value, time: document.getElementById('nj-time').value, address: (Store.get('contacts', cid) || {}).address || '', notes: document.getElementById('nj-notes').value.trim(), items: val ? [{ desc: title, qty: 1, rate: val }] : [] }, true);
     Store.logActivity('job', 'Job scheduled — ' + title); App.closeModal(); App.toast('Job scheduled. Confirmation text queued.'); App.go('jobs');
   };
   A['move-job'] = function (el, d) {
     var j = Store.get('jobs', d.id); if (!j) return;
     var i = JSTAGES.findIndex(function (s) { return s[0] === j.status; }) + (+d.dir); if (i < 0 || i >= JSTAGES.length) return;
-    var newStatus = JSTAGES[i][0];
-    Store.update('jobs', d.id, { status: newStatus });
-    // fire notification with agent name when job goes to in_progress (on-my-way)
-    if (newStatus === 'in_progress') {
-      var tech = Store.teamMember(j.assignedTo);
-      var tpl = Store.templateForEvent('on_my_way');
-      if (tpl) {
-        var c = Store.get('contacts', j.contactId);
-        var rendered = Store.renderTemplate(tpl, { client_name: c ? c.name : '', tech_name: tech ? tech.name : 'Your technician', address: j.address || '', job_title: j.title });
-        Store.recordOutbox({ contactId: j.contactId, channel: tpl.channel, templateId: tpl.id, subject: rendered.subject, body: rendered.body });
-      }
-      Store.logActivity('job', (tech ? tech.name : 'Tech') + ' is on the way — ' + j.title);
-    }
-    App.refresh(); App.closeDrawer();
+    Store.update('jobs', d.id, { status: JSTAGES[i][0] }); App.refresh(); App.closeDrawer();
   };
   A['complete-job'] = function (el, d) { Store.update('jobs', d.id, { status: 'complete' }); var j = Store.get('jobs', d.id); Store.logActivity('job', 'Job completed — ' + j.title); App.refresh(); App.closeDrawer(); App.toast('Job complete. Ready to invoice.'); };
   A['job-to-invoice'] = function (el, d) {
@@ -629,22 +602,8 @@
   A['approve-estimate'] = function (el, d) { Store.update('estimates', d.id, { status: 'approved' }); App.refresh(); openRecord('estimate', d.id); App.toast('Marked approved. Convert it to a job when ready.'); };
   A['estimate-to-job'] = function (el, d) {
     var e = Store.get('estimates', d.id); if (!e) return;
-    App.closeDrawer();
-    var teamOpts = Store.all('team').map(function (m) { return '<option value="' + m.id + '">' + esc(m.name) + '</option>'; }).join('');
-    var body = '<p class="muted">Converting ' + esc(e.number) + ' to a job. Choose a date and agent, or leave blank to create it as unscheduled.</p>' +
-      '<div class="form-grid">' + field('Date', input('etj-date', 'type="date"')) + field('Time', input('etj-time', 'type="time" value="09:00"')) + '</div>' +
-      field('Assign to', '<select class="inp" id="etj-assign"><option value="">Unassigned</option>' + teamOpts + '</select>');
-    App.openModal('Schedule job from ' + e.number, body,
-      btn('Cancel', { action: 'close-modal' }) + btn('Create job', { variant: 'brand', action: 'confirm-estimate-to-job', data: { id: e.id } }));
-  };
-  A['confirm-estimate-to-job'] = function (el, d) {
-    var e = Store.get('estimates', d.id); if (!e) return;
-    var g = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
-    var jobDate = g('etj-date') || null;
-    var jobTime = g('etj-time') || '';
-    var assignTo = g('etj-assign') || null;
-    Store.insert('jobs', { title: e.items[0].desc, contactId: e.contactId, value: Store.lineTotal(e.items), status: jobDate ? 'scheduled' : 'scheduled', assignedTo: assignTo, date: jobDate, time: jobTime, address: (Store.get('contacts', e.contactId) || {}).address || '', notes: 'From ' + e.number, items: e.items }, true);
-    Store.logActivity('job', 'Job created from ' + e.number); App.closeModal(); App.toast('Job created from ' + e.number + '.'); App.go('jobs');
+    Store.insert('jobs', { title: e.items[0].desc, contactId: e.contactId, value: Store.lineTotal(e.items), status: 'scheduled', assignedTo: 'u_owner', date: Store.iso(Store.dayShift(3)), time: '09:00', address: (Store.get('contacts', e.contactId) || {}).address || '', notes: 'From ' + e.number, items: e.items }, true);
+    Store.logActivity('job', 'Job created from ' + e.number); App.closeDrawer(); App.toast('Job created from ' + e.number + '.'); App.go('jobs');
   };
   A['ai-followup'] = function (el, d) { var e = Store.get('estimates', d.id); App.closeDrawer(); App.go('ai'); setTimeout(function () { aiSend('Draft a follow-up email for ' + Store.contactName(e.contactId) + ' about estimate ' + e.number + ' for ' + money(Store.estimateTotal(e)) + '.'); }, 120); };
 
@@ -721,37 +680,6 @@
   /* ai */
   A['ai-send'] = function () { aiSend(); };
   A['ai-quick'] = function (el, d) { aiSend(d.q); };
-
-  /* edit job modal (Tickets 2, 4, 9) */
-  A['edit-job'] = function (el, d) {
-    var j = Store.get('jobs', d.id); if (!j) return;
-    var teamOpts = Store.all('team').map(function (m) { return '<option value="' + m.id + '"' + (m.id === j.assignedTo ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join('');
-    var statusOpts = App._JSTAGES.map(function (st) { return '<option value="' + st[0] + '"' + (st[0] === j.status ? ' selected' : '') + '>' + st[1] + '</option>'; }).join('');
-    var body = '<div class="form-grid">' +
-      field('Date', input('ej-date', 'type="date" value="' + esc(j.date || '') + '"')) +
-      field('Time', input('ej-time', 'type="time" value="' + esc(j.time || '') + '"')) + '</div>' +
-      '<div class="form-grid">' +
-      field('Assigned agent', '<select class="inp" id="ej-assign">' + '<option value="">Unassigned</option>' + teamOpts + '</select>') +
-      field('Status', '<select class="inp" id="ej-status">' + statusOpts + '</select>') + '</div>' +
-      field('Client', '<select class="inp" id="ej-contact">' + contactOptions(j.contactId) + '</select>') +
-      field('Notes', '<textarea class="inp" id="ej-notes" rows="3">' + esc(j.notes || '') + '</textarea>');
-    App.openModal('Edit job — ' + j.title, body,
-      btn('Cancel', { action: 'close-modal' }) + btn('Save changes', { variant: 'brand', action: 'save-edit-job', data: { id: j.id } }));
-  };
-  A['save-edit-job'] = function (el, d) {
-    var g = function (id) { var e = document.getElementById(id); return e ? e.value : ''; };
-    var patch = {
-      date: g('ej-date') || null,
-      time: g('ej-time') || '',
-      assignedTo: g('ej-assign') || null,
-      status: g('ej-status'),
-      contactId: g('ej-contact'),
-      notes: g('ej-notes').trim()
-    };
-    Store.update('jobs', d.id, patch);
-    Store.logActivity('job', 'Job updated — ' + (Store.get('jobs', d.id) || {}).title);
-    App.closeModal(); App.toast('Job updated.'); App.refresh();
-  };
 
   /* calendar */
   A['cal-prev'] = function () { var c = App.state.cal; c.m--; if (c.m < 0) { c.m = 11; c.y--; } App.refresh(); };

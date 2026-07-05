@@ -84,7 +84,7 @@ The AI assistant and real email/SMS use serverless functions, not Supabase. Keep
 
 ## If something's off
 
-- App loads but says "running on local storage" in the console → the Supabase library didn't load or config is blank; check `supabase-config.js` and that the CDN `<script>` is present.
+- App loads but says "running on local storage" in the console → the Supabase library or config did not load; make sure `supabase-lib.js`, `supabase-config.js`, and `supabase.js` all deployed. A yellow "Cloud library didn't load" banner means `supabase-lib.js` is missing.
 - Signed in but no data → confirm `schema.sql` ran (tables exist) and RLS policies were created; check the browser console for policy errors.
 - Photos don't upload → confirm the `job-photos` bucket exists and is public.
 
