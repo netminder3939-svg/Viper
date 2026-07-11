@@ -14,6 +14,12 @@
   var App = global.App, Store = global.Store;
   if (!App || !Store) return;
 
+  // Testing mode: skip cloud + login entirely, run on-device so anyone can test.
+  if (global.VIPER_NO_LOGIN) {
+    if (global.console) console.info('[Viper OS] Login disabled (VIPER_NO_LOGIN) — running on-device for testing.');
+    return;
+  }
+
   var URL = global.SUPABASE_URL, KEY = global.SUPABASE_ANON_KEY;
   var lib = global.supabase; // from supabase-lib.js (self-hosted)
   function offlineBanner(msg) {
